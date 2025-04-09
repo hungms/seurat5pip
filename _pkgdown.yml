@@ -1,0 +1,45 @@
+url: https://hungms.github.io/seurat5pip/
+
+authors:
+  Matthew Hung:
+    href: https://hungms.github.io/Portfolio/
+
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+development:
+  mode: auto
+
+navbar:
+  structure:
+    left:
+    - intro
+    - articles
+    - reference
+    - tutorials
+    - news
+    right:
+    - search
+    - github
+    - lightswitch
+  components:
+    articles:
+      text: "Vignettes"
+      menu:
+      - text: "Quick Start"
+        href: articles/20241203.html
+      - text: "Ipynb"
+        href: articles/20241206.html
+
+reference:
+- title: Differential Expression
+  contents:
+  - starts_with("run_diffexp_")
+  - starts_with("convert_seurat5_to_deseq2")
+  - starts_with("select_significant_genes")
+  - starts_with("compare_diffexp")
+
+- title: Save Functions
+  contents:
+  - starts_with("save_")
