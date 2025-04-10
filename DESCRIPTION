@@ -14,5 +14,11 @@ Depends:
     qs,
     R (>= 4.0.0),
     Seurat (>= 5.0.0),
+Imports:
     MASS,
+    scales,
+    stringr,
+    stats,
+    magrittr,
+    rlang
 Remotes: hungms/plotr, hungms/strpip, hungms/deseq2pip, alserglab/mascarade

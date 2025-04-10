@@ -232,6 +232,8 @@ plot_reduction_mask <- function(obj, group.by, reduction = "umap", mask.size = 1
 #' @export
 #' @examples
 #' \dontrun{
+#' plot_reduction_density(obj, split.by = "seurat_clusters")
+#' }
 plot_reduction_density <- function(obj, split.by = NULL, reduction = "umap", reduction.type = "UMAP", adjust = 5, pal = "Greys",...){
     
     # get embeddings

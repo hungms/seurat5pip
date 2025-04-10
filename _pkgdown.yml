@@ -39,7 +39,10 @@ reference:
   - starts_with("convert_seurat5_to_deseq2")
   - starts_with("select_significant_genes")
   - starts_with("compare_diffexp")
-
+- title: Plot Functions
+  - starts_with("plot")
+  - matches("dotplot")
+  - matches("reduction")
 - title: Save Functions
   contents:
   - starts_with("save_")

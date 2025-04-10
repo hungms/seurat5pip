@@ -47,7 +47,7 @@ run_diffexp_onetoall <- function(obj, group.by, test.use = "DESeq2", batch = NUL
     if(save_data){
 
         for(i in seq_along(markers.list)){
-            save_tsv(markers.list[[i]], tsv_name = paste0("diffexp_", test.use, ".tsv"), save_dir = paste0(save_dir, "/diffexp/", paste0(assay, "_", test.use, "_", "GROUP-BY-", group.by, batch_label, "/", names(markers.list)[i])), row.names = FALSE)}
+            save_tsv(markers.list[[i]], tsv_name = paste0("diffexp_", test.use, ".tsv"), save_dir = paste0(save_dir, "/diffexp/", paste0(assay, "_", test.use, "_", "GROUP-BY-", group.by, batch_label, "/", names(markers.list)[i])), row.names = FALSE)}}
     
     return(markers)
 }
@@ -72,4 +72,5 @@ convert_seurat5_to_deseq2 <- function(diffexp){
             log2FoldChange = avg_log2FC,
             comparison = ifelse(str_detect(cluster, "_vs_"), cluster, paste0(cluster, "_vs_All"))) %>%
         dplyr::select(-c("p_val", "p_val_adj", "avg_log2FC", "cluster"))
-    return(diffexp)}
+    return(diffexp)
+}
