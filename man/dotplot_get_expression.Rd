@@ -6,28 +6,25 @@
 \usage{
 dotplot_get_expression(
   obj,
-  genes,
+  features,
   group.by,
   split.by = NULL,
-  assay = "RNA",
-  slot = "data",
-  scale = TRUE
+  scale = TRUE,
+  mode = 1
 )
 }
 \arguments{
 \item{obj}{Seurat object}
 
-\item{genes}{Vector of genes to include}
+\item{features}{Vector of features to include}
 
 \item{group.by}{Column to group by}
 
 \item{split.by}{Column to split by (optional)}
 
-\item{assay}{Assay to use}
-
-\item{slot}{Data slot to use}
-
 \item{scale}{Logical; whether to scale data}
+
+\item{mode}{1 or 2; 1 is to replace them with NA, 2 is to replace them with 0}
 }
 \value{
 Dataframe with summarized expression values

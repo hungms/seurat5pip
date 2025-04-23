@@ -8,12 +8,11 @@ plot_dotplot(
   obj,
   group.by,
   split.by = NULL,
-  genes,
-  assay = "RNA",
-  slot = "data",
+  features,
+  diffexp = NULL,
+  mode = 1,
   scale = TRUE,
   pal = NULL,
-  diffexp = NULL,
   coord_flip = TRUE,
   unique = FALSE
 )
@@ -25,17 +24,15 @@ plot_dotplot(
 
 \item{split.by}{Metadata column to split display (optional)}
 
-\item{genes}{Gene names as vector or named list}
+\item{features}{Features as character vector or named list}
 
-\item{assay}{Assay name, defaults to "RNA"}
+\item{diffexp}{Dataframe or file path for differential expression results}
 
-\item{slot}{Slot name, defaults to "data"}
+\item{mode}{1 or 2; 1 is to replace them with NA, 2 is to replace them with 0}
 
 \item{scale}{Logical; if TRUE, scale gene expression across cells}
 
 \item{pal}{A vector of hexcode colors for the expression gradient}
-
-\item{diffexp}{Dataframe or file path for differential expression results}
 
 \item{coord_flip}{Logical; if TRUE, plot features on y-axis}
 
@@ -52,14 +49,14 @@ average expression level.
 \examples{
 \dontrun{
 # Basic usage
-plot_dotplot(seurat_obj, group.by = "seurat_clusters", genes = c("CD3E", "CD4", "CD8A"))
+plot_dotplot(seurat_obj, group.by = "seurat_clusters", features = c("CD3E", "CD4", "CD8A"))
 
 # Using named gene lists and showing differential expression
-genes_list <- list(
+features_list <- list(
   "T cells" = c("CD3E", "CD4", "CD8A"),
   "B cells" = c("CD19", "MS4A1")
 )
-plot_dotplot(seurat_obj, group.by = "cell_type", genes = genes_list, 
+plot_dotplot(seurat_obj, group.by = "cell_type", features = features_list, 
              diffexp = "de_results.csv")
 }
 }

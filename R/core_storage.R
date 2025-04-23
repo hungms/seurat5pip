@@ -116,7 +116,8 @@ save_jupyter_plot <- function(plot, save_dir, width = getOption("repr.plot.width
     
     # Construct file path
     file_path <- paste0(save_dir, "/", get_name(plot), ".pdf")
-    
+    print(plot)
+
     # Try using Cairo if available, otherwise use standard PDF
     tryCatch({
         if (requireNamespace("Cairo", quietly = TRUE)) {

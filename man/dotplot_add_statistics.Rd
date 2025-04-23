@@ -4,10 +4,20 @@
 \alias{dotplot_add_statistics}
 \title{Add differential expression significance to expression data}
 \usage{
-dotplot_add_statistics(exprs_df, diffexp, split.by = NULL)
+dotplot_add_statistics(
+  obj,
+  exprs,
+  diffexp,
+  fc.thresh = 0,
+  padj.thresh = 0.05,
+  min.pct = 0.1,
+  split.by = NULL
+)
 }
 \arguments{
-\item{exprs_df}{Expression dataframe}
+\item{obj}{Seurat object}
+
+\item{exprs}{Expression dataframe}
 
 \item{diffexp}{Differential expression results}
 

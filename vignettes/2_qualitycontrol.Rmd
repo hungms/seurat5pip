@@ -1,0 +1,81 @@
+
+
+
+```{r}
+library(Seurat)
+library(SeuratData)
+library(patchwork)
+library(strpip)
+```
+
+
+```{r}
+data("pbmcsca")
+obj <- UpdateSeuratObject(pbmcsca)
+```
+
+```{r}
+qc_feature_percentage <- function(obj){
+    dict <- grep("\\.string$", ls("package:strpip"), value = TRUE)
+    dict_list    <- mget(dict, envir = asNamespace("strpip"))
+    for(i in 1:length(dict_list)){
+        obj <- PercentageFeatureSet(obj, pattern = dict_list[[i]], col.name = paste0("percent.", gsub("\\.string$", "", dict[i])))}
+    return(obj)}
+
+obj <- qc_feature_percentage(obj)
+```
+
+
+```{r}
+qc_mad_threshold <- function(obj, columns = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.hb"), dev = 5){
+        
+        meta <- obj@meta.data
+
+        threshold_list <- list()
+        outcome_list <- list()
+
+        for(i in seq_along(columns)){
+            selected <- meta[[columns[i]]]
+            median <- median(selected)
+            mad <- median(abs(selected - median))
+            upper <- median + dev*mad
+            lower <- median - dev*mad
+            threshold_list[[i]] <- c(column = columns[i], median = median, mad = mad, upper = upper, lower = lower)
+            outcome_list[[i]] <- ifelse(selected >= (median - dev*mad) & selected <= (median + dev*mad), "Pass", "Fail")
+            names(outcome_list)[i] <- paste0("mad_", columns[i])}
+
+        obj@misc[["mad_threshold"]] <- bind_rows(threshold_list)
+
+        outcome_list <- as.data.frame(outcome_list)
+        outcome_list$mad_count <- apply(outcome_list, 1, function(row) ifelse(all(row == "Pass"), "Pass", "Fail"))
+        rownames(outcome_list) <- rownames(meta)
+        outcome_list <- bind_rows(outcome_list)[colnames(obj),]
+        
+        obj@meta.data <- cbind(obj@meta.data, outcome_list)
+        return(obj)}
+
+obj <- qc_mad_threshold(obj)
+```
+
+
+
+
+
+plot_feature_percentage <- function(obj, add_threshold = T){
+    dict <- grep("\\.string$", ls("package:strpip"), value = TRUE)
+    dict_list <- mget(dict, envir = asNamespace("strpip"))
+
+    for(i in seq_along(dict_list)){
+        obj <- PercentageFeatureSet(obj, pattern = dict_list[[i]], col.name = paste0("percent.", gsub("\\.string$", "", dict[i])))}
+    return(obj)}
+    
+    
+    
+    }
+
+
+
+
+
+
+```

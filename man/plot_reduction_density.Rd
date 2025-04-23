@@ -7,6 +7,7 @@
 plot_reduction_density(
   obj,
   split.by = NULL,
+  facet.ncol = 2,
   reduction = "umap",
   reduction.type = "UMAP",
   adjust = 5,
@@ -18,6 +19,8 @@ plot_reduction_density(
 \item{obj}{Seurat object}
 
 \item{split.by}{Metadata column to split by}
+
+\item{facet.ncol}{Number of columns for facets}
 
 \item{reduction}{Reduction name}
 

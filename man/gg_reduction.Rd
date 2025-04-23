@@ -6,20 +6,25 @@
 \usage{
 gg_reduction(
   df,
+  reduction.type = NULL,
   group.by = NULL,
   split.by = NULL,
-  reduction.type = "UMAP",
-  pt.size = 0.5,
-  pt.alpha = 0.5,
   facet.ncol = 2,
-  legend.ncol = 1,
   shuffle = T
 )
 }
 \arguments{
-\item{obj}{Seurat object}
+\item{df}{Data frame}
 
-\item{reduction}{Reduction name}
+\item{reduction.type}{Reduction type}
+
+\item{group.by}{Metadata column to group by}
+
+\item{split.by}{Metadata column to split by}
+
+\item{facet.ncol}{Number of columns for facets}
+
+\item{shuffle}{Whether to shuffle points}
 }
 \value{
 Data frame with reduction

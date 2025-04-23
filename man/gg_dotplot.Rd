@@ -4,26 +4,16 @@
 \alias{gg_dotplot}
 \title{Create a dot plot with customizable settings}
 \usage{
-gg_dotplot(
-  df,
-  x,
-  y,
-  coord_flip = TRUE,
-  stroke_legend = FALSE,
-  palette,
-  scale = TRUE
-)
+gg_dotplot(exprs, x, y, coord_flip = TRUE, palette, scale = TRUE)
 }
 \arguments{
-\item{df}{Dataframe with expression values}
+\item{exprs}{Dataframe with expression values}
 
 \item{x}{X-axis column name}
 
 \item{y}{Y-axis column name}
 
 \item{coord_flip}{Logical; whether the plot coordinates are flipped}
-
-\item{stroke_legend}{Whether to include significance stroke legend}
 
 \item{palette}{Color palette for expression values}
 

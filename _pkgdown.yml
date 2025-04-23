@@ -33,16 +33,26 @@ navbar:
         href: articles/20241206.html
 
 reference:
-- title: Differential Expression
+- title: Core Objects
   contents:
-  - starts_with("run_diffexp_")
-  - starts_with("convert_seurat5_to_deseq2")
-  - starts_with("select_significant_genes")
-  - starts_with("compare_diffexp")
+  - matches("create_seurat_object")
+- title: Core Assays
+  contents:
+  - matches("set_assay_keys")
+  - matches("get_assay_keys")
+  - matches("join_layers")
+- title: Core Features
+  contents:
+  - matches("get_all_features")
+  - matches("remove_features")
+  - matches("remove_vdj_features")
+  - matches("return_features")
 - title: Plot Functions
-  - starts_with("plot")
+  contents:
   - matches("dotplot")
   - matches("reduction")
 - title: Save Functions
   contents:
-  - starts_with("save_")
+  - matches("save_jupyter_plot")
+  - matches("save_plot")
+  - matches("save_tsv")

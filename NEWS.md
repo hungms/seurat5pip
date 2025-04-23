@@ -1,8 +1,33 @@
 # seurat5pip News
 
-## seurat5pip 0.1.0 (2023-11-01)
+## v1.0.0 
+### Official Release of seurat5pip 
 
-### Features
+
+# Development Stage
+## v0.1.1
+### Overview
+* Rebuild pipeline structure for all plot functions for readability
+* Implement core functionalities for Seurat objects
+* Rename files from `R/` directories for pipeline development
+
+### New Features
+* New core functionalities to modify Seurat Object: 
+  * assays e.g. `set_assay_keys()`, `get_assay_keys`, `join_layers()`
+  * features e.g. `remove_features()`, `return_features()`, `intersect_features()`
+* `plot_reduction_mapquery()` to visualize query data on original reference map dataset
+
+### Enhancements
+* Rebuild structure for `plot_reduction()` and `plot_dotplot()`
+* `plot_dotplot()` now remove cells with 0 expression of selected genes to calculate average expression and improve color visualization
+
+## v0.1.0
+### Overview
+* This is the first development stage of the package, intended for use with Seurat v5
+* Custom plotting themes and aesthetics for publication-ready visualizations
+* Support for various visual customizations through parameters 
+
+### New Features
 
 * Initial release of seurat5pip, a package for Seurat v5 pipelines
 * Comprehensive tools for single-cell multi-modal data analysis and visualization
@@ -11,10 +36,6 @@
   * `plot_reduction_mask()` - Add cluster outline masks to dimensionality reduction plots
   * `plot_reduction_density()` - Add density contours to dimensionality reduction plots
 
-* Differential expression analysis:
-  * `run_diffexp_onetoall()` - Perform differential expression analysis on all cell clusters
-  * `select_significant_genes()` - Filter and select significant differentially expressed genes
-  * `convert_seurat5_to_deseq2()` - Convert Seurat5 differential expression results to DESeq2 format
 
 * Data processing:
   * `process_seurat()` - Streamlined processing of Seurat objects with sensible defaults
@@ -24,15 +45,3 @@
   * `save_tsv()` - Save data frames as tab-separated files
   * `save_plot()` - Save ggplot objects as PDF files with Cairo support
   * `save_jupyter_plot()` - Specialized plotting for Jupyter notebook environments
-
-### Dependencies
-
-* Compatible with Seurat v5.0.0 and above
-* Utilizes MASS for statistical functions
-* Optimized for R 4.0.0 and above
-
-### Notes
-
-* This is the first release of the package, intended for use with Seurat v5
-* Custom plotting themes and aesthetics for publication-ready visualizations
-* Support for various visual customizations through parameters 
