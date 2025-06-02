@@ -4,47 +4,47 @@
 #' This function processes RNA, ADT (Antibody-Derived Tags), and HTO (Hashtag Oligonucleotides)
 #' modalities if present in the cellranger/h5 outputs.
 #' 
-#' @param dirs A vector of directories containing cellranger/h5 outputs
-#' @param run_ids A vector of run IDs for each directory
+#' @param dir A vector of directories containing cellranger/h5 outputs
+#' @param project A vector of run IDs for each directory
 #' @param file_format The format of the data to be loaded. Either "cellranger" or "h5". Defaults to "cellranger"
 #' @param hto_prefix Prefix to identify HTO tag names if HTO library is present. Defaults to NULL
 #' @return A list of Seurat objects, with each entry corresponding to a sample
 #' @export
-create_seurat_object <- function(dirs, run_ids, file_format = "cellranger", hto_prefix = NULL, merge = TRUE){    # , denoise_adt = TRUE
+create_seurat_object <- function(dir, project, file_format = "cellranger", hto_prefix = NULL, merge = TRUE){    # , denoise_adt = TRUE
 
     # validations
     stopifnot(file_format %in% c("cellranger", "h5")) 
-    stopifnot(length(run_ids) == length(dirs))
+    stopifnot(length(project) == length(dir))
 
     # initialize list
     obj.list <- list()
     
     # setup for loop
-    for(i in seq_along(run_ids)){
+    for(i in seq_along(project)){
         
         # log progress bar
-        message(paste0("Processing ", i, " out of ", length(run_ids), " runs..."))
-        log_progress_bar(i, length(run_ids), pb = NULL)
+        message(paste0("Processing ", i, " out of ", length(project), " runs..."))
+        log_progress_bar(i, length(project), pb = NULL)
         
         # read cellranger output
         if(file_format == "cellranger"){
 
             # validate directory and cellranger output
-            stopifnot(dir.exists(dirs[i]))
-            stopifnot(c("barcodes.tsv", "features.tsv", "matrix.mtx") %in% list.files(dirs[i]))
+            stopifnot(dir.exists(dir[i]))
+            stopifnot(c("barcodes.tsv", "features.tsv", "matrix.mtx") %in% list.files(dir[i]))
 
             # read cellranger output
-            matrix_data <- Read10X(dirs[i])}
+            matrix_data <- Read10X(dir[i])}
 
         # read h5 output
         else if(file_format == "h5"){
 
             # validate directory and h5 file
-            stopifnot(file.exists(dirs[i]))
-            stopifnot(grepl(".h5$", dirs[i]))
+            stopifnot(file.exists(dir[i]))
+            stopifnot(grepl(".h5$", dir[i]))
 
             # read h5 file
-            matrix_data <- Read10X_h5(dirs[i])
+            matrix_data <- Read10X_h5(dir[i])
 
             # replace underscores with dashes in feature names
             for(k in seq_along(matrix_data)){
@@ -103,7 +103,7 @@ create_seurat_object <- function(dirs, run_ids, file_format = "cellranger", hto_
             #if(denoise_adt){
             #    obj <- run_dsb(
             #        obj, 
-            #        dir = dirs[i], 
+            #        dir = dir[i], 
             #        denoise.counts = TRUE, 
             #        use.isotype.control = FALSE, 
             #        isotype.control.name.vec = NULL, 
@@ -113,18 +113,18 @@ create_seurat_object <- function(dirs, run_ids, file_format = "cellranger", hto_
 
        	# add run names to metadata
         obj <- set_assay_keys(obj)
-        obj@meta.data$run_ids <- rep(run_ids[i], ncol(obj))
+        obj@meta.data$project <- rep(project[i], ncol(obj))
         obj <- RenameCells(
             obj, 
-            new.names = paste0(run_ids[i], "_", colnames(obj)))
+            new.names = paste0(project[i], "_", colnames(obj)))
         obj.list[[i]] <- obj
     }
 
     # add run names to list
-    names(obj.list) <- paste0(run_ids)
+    names(obj.list) <- paste0(project)
 
     # logging
-    m1 <- paste("run_ids = ", paste0(run_ids, collapse = ", "))
+    m1 <- paste("project = ", paste0(project, collapse = ", "))
     m2 <- paste("Number of cells = ", sum(sapply(obj.list, function(x) ncol(x))))
     m3 <- paste("Number of RNA features = ", sum(sapply(obj.list, function(x) nrow(x[["RNA"]]))))
     m4 <- paste("Number of ADT features = ", sum(sapply(obj.list, function(x) nrow(x[["ADT"]]))))
@@ -154,6 +154,10 @@ split_obj <- function(obj, split.by){
         stopifnot(split.by %in% colnames(obj@meta.data))
         obj.list <- SplitObject(obj, split.by = split.by)}
     else{
-        obj.list <- list(`obj` = obj)}
+        obj.list <- list(obj)
+        if(project %in% colnames(obj@meta.data)){
+            if(length(unique(obj$project)) == 1){
+                names(obj.list) <- unique(obj$project)}}
+    }
     return(obj.list)
 }
