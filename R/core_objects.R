@@ -117,6 +117,11 @@ create_seurat_object <- function(dir, project, file_format = "cellranger", hto_p
         obj <- RenameCells(
             obj, 
             new.names = paste0(project[i], "_", colnames(obj)))
+
+        # validate object
+        obj <- validate_object(obj)
+
+        # add to list
         obj.list[[i]] <- obj
     }
 
@@ -150,14 +155,28 @@ create_seurat_object <- function(dir, project, file_format = "cellranger", hto_p
 #' @param split.by A metadata column name to split the object by.
 #' @return A list of Seurat objects.
 split_obj <- function(obj, split.by){
+
+    # validate object
+    obj <- validate_object(obj)
+
+    # if split.by is provided
     if(!is.null(split.by)){
+
+        # make sure split.by is a column in metadata
         stopifnot(split.by %in% colnames(obj@meta.data))
+
+        # split object
         obj.list <- SplitObject(obj, split.by = split.by)}
+    
+    # if split.by is not provided
     else{
+
+        # create list
         obj.list <- list(obj)
-        if(project %in% colnames(obj@meta.data)){
-            if(length(unique(obj$project)) == 1){
-                names(obj.list) <- unique(obj$project)}}
-    }
+
+        # add run names to list
+        names(obj.list) <- unique(obj$project)}
+
+    # return list
     return(obj.list)
 }
