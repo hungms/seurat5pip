@@ -1,3 +1,84 @@
+#' qc standard
+#'
+#' This function performs standard quality control on a Seurat object.
+#' @param obj Seurat object
+#' @param split.by Metadata column to split the object by
+#' @param assay Assay to validate
+#' @param min.features Minimum number of features to keep
+#' @param min.pct Minimum percentage of cells expressing a feature
+#' @param min.cells Minimum number of cells expressing a feature
+#' @return Seurat object
+#' @export
+qc_standard <- function(obj, split.by = NULL, assay = "RNA", min.features = 200, min.pct = 0.01, min.cells = NULL){
+
+    # validate min.pct and min.cells
+    stopifnot(is.null(min.cells) != is.null(min.pct))
+    stopifnot(min.pct > 0)
+
+    # validate assays
+    obj <- validate_assays(obj)
+
+    # get old dimensions
+    old_dim <- dim(obj[[assay]]$counts)
+
+    # split object
+    obj.list <- split_obj(obj = obj, split.by = split.by)
+
+    # for each object
+    for(o in seq_along(obj.list)){
+
+        # if min.pct
+        if(!is.null(min.pct)){
+            
+            # get features with min.pct expression
+            ncells_with_feature <- rowSums(obj.list[[o]][[assay]]$counts > 0)
+            ncells <- ncol(obj.list[[o]])
+            features.to.keep <- rownames(obj.list[[o]][[assay]]$counts)[ncells_with_feature / ncells >= min.pct]
+
+            # create new assay
+            obj.list[[o]][[assay]] <- CreateAssay5Object(
+                counts = obj.list[[o]][[assay]]$counts[features.to.keep, ], 
+                data = obj.list[[o]][[assay]]$data[features.to.keep, ], 
+                min.features = min.features, 
+                min.cells = 0)
+            
+            # min.cells.message
+            min.cells.message <- paste0(min.pct, "%")
+            }
+
+        # if min.cells
+        else if(!is.null(min.cells)){
+
+            # create new assay
+            obj.list[[o]][[assay]] <- CreateAssay5Object(
+                counts = obj.list[[o]][[assay]]$counts, 
+                data = obj.list[[o]][[assay]]$data, 
+                min.features = min.features, 
+                min.cells = min.cells)
+            
+            # min.cells.message
+            min.cells.message <- min.cells
+            }
+        }
+    
+    # merge objects
+    if(length(obj.list) > 1){
+        obj <- merge(obj.list[[1]], obj.list[c(2:length(obj.list))])}
+    else{
+        obj <- obj.list[[1]]}
+
+    # get new dimensions
+    new_dim <- dim(obj[[assay]]$counts)
+
+    # print message
+    m1 <- paste0(old_dim[1] - new_dim[1], " features removed from ",  assay, " assay")
+    m2 <- paste0(old_dim[2] - new_dim[2], " cells removed from ",  assay, " assay")
+    log_function(m1, m2)
+
+    # return object
+    return(obj)}
+
+
 #' feature percentages
 #'
 #' This function calculates the percentage of features in the Seurat object.
