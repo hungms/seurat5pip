@@ -38,14 +38,13 @@ reference:
   - matches("create_seurat_object")
 - title: Core Assays
   contents:
-  - matches("set_assay_keys")
-  - matches("get_assay_keys")
   - matches("join_layers")
+  - matches("merge_features")
 - title: Core Features
   contents:
   - matches("get_all_features")
+  - matches("subset_features")
   - matches("remove_features")
-  - matches("remove_vdj_features")
   - matches("return_features")
 - title: Plot Functions
   contents:
@@ -53,6 +52,8 @@ reference:
   - matches("reduction")
 - title: Save Functions
   contents:
-  - matches("save_jupyter_plot")
-  - matches("save_plot")
-  - matches("save_tsv")
+
+- title: Internal
+  contents:
+  - matches("set_assay_keys")
+  - matches("get_assay_keys")

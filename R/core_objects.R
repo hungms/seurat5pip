@@ -142,19 +142,22 @@ create_seurat_object <- function(dir, project, file_format = "cellranger", hto_p
 
     # merge objects
     if(merge){
-        obj <- merge(obj.list[[1]], obj.list[c(2:length(obj.list))])}
+        obj <- merge_objects(obj.list)}
+    else{
+        obj <- obj.list}
 
     return(obj)
 }
 
-#' split_obj
+#' split_object
 #'
 #' Splits a Seurat object into a list of Seurat objects based on a metadata column.
 #'
 #' @param obj A Seurat object.
 #' @param split.by A metadata column name to split the object by.
 #' @return A list of Seurat objects.
-split_obj <- function(obj, split.by){
+#' @export
+split_object <- function(obj, split.by){
 
     # validate object
     obj <- validate_object(obj)
@@ -179,4 +182,26 @@ split_obj <- function(obj, split.by){
 
     # return list
     return(obj.list)
+}
+
+#' merge_objects
+#'
+#' Merges a list of Seurat objects into a single Seurat object.
+#'
+#' @param obj.list A list of Seurat objects.
+#' @return A single Seurat object.
+#' @export
+merge_objects <- function(obj.list){
+
+    # merge objects
+    if(length(obj.list) > 1){
+        obj <- merge(obj.list[[1]], obj.list[c(2:length(obj.list))], merge.dr = TRUE)}
+    else{
+        obj <- obj.list[[1]]}
+
+    # join layers
+    obj <- join_layers(obj)
+
+    # return object
+    return(obj)
 }

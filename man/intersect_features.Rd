@@ -4,12 +4,12 @@
 \alias{intersect_features}
 \title{intersect_features}
 \usage{
-intersect_features(obj.list, assay = "RNA", min.cells = 3)
+intersect_features(obj, split.by, assay)
 }
 \arguments{
-\item{obj.list}{a list of Seurat object}
-
 \item{assay}{assay name}
+
+\item{obj.list}{a list of Seurat object}
 
 \item{min.cells}{minimum number of cells expressing the gene}
 }

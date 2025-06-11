@@ -7,19 +7,23 @@
 #' @export
 validate_assays <- function(obj){
 
-    if(!all(class(obj@assays) %in% c("Assay", "Assay5", "SCTAssay"))){
+    # get class of assays
+    assay.class <- unlist(lapply(obj@assays, class))
+
+    # validate assays
+    if(!all(assay.class %in% c("Assay", "Assay5", "SCTAssay"))){
         stop("Assays must be of class Assay, Assay5, or SCTAssay")}
 
     # for each assay
-    assay.name <- names(obj@assays)[which(class(obj@assays) == "Assay")]
+    assay.name <- names(assay.class)[which(assay.class == "Assay")]
 
     # for all Assay3
-    for(assay in which.assay){
+    for(assay in assay.name){
         # convert to Assay5
         obj[[assay]] <- as(obj[[assay]], "Assay5")}
 
     # log
-    m1 <- paste0("Converted ", paste0(assay.name, collapse = ", "), " from Assay3 to Assay5")
+    m1 <- paste0("Converted ", paste0(names(assay.class), collapse = ", "), " from Assay3 to Assay5")
     log_function(m1)
 
     return(obj)}

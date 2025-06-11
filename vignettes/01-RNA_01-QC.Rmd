@@ -1,0 +1,31 @@
+
+
+
+```{r}
+library(Seurat)
+library(SeuratData)
+library(patchwork)
+library(strpip)
+library(seurat5pip)
+```
+
+```{r}
+data("pbmcsca")
+obj <- UpdateSeuratObject(pbmcsca)
+obj$project <- "pbmcsca" # project name
+```
+
+```{r}
+# qc by standard
+filtered_obj <- qc_by_standard(obj, split.by = "project", min.pct = 0.01, output_dir = "test/pipeline/01-RNA/01-QC/")
+```
+
+```{r}
+# feature percentages
+filtered_obj <- feature_percentages(filtered_obj, split.by = "project", output_dir = "test/pipeline/01-RNA/01-QC/")
+```
+
+```{r}
+# qc by MAD
+filtered_obj <- qc_by_mad(filtered_obj, split.by = "project", var = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.hb"), dev = 5, output_dir = "test/pipeline/01-RNA/01-QC/")
+```

@@ -7,8 +7,14 @@
 set_assay_keys(obj)
 }
 \arguments{
-\item{obj}{Seurat object}
+\item{obj}{A Seurat object}
+}
+\value{
+The Seurat object with standardized assay keys
 }
 \description{
-Bugfix for setting assay keys when creating Seurat object
+Sets standardized keys for all assays in a Seurat object.
+This function addresses inconsistencies in assay key naming by
+setting each assay key to the lowercase assay name followed by an underscore.
 }
+\keyword{internal}

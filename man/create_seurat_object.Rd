@@ -5,29 +5,27 @@
 \title{create_seurat_object}
 \usage{
 create_seurat_object(
-  data_dirs,
-  samples,
-  format = "cellranger",
-  hto_pattern = NULL,
-  denoise_adt = TRUE
+  dir,
+  project,
+  file_format = "cellranger",
+  hto_prefix = NULL,
+  merge = TRUE
 )
 }
 \arguments{
-\item{data_dirs}{A vector of directories containing cellranger outputs}
+\item{dir}{A vector of directories containing cellranger/h5 outputs}
 
-\item{samples}{A vector of sample names for each directory}
+\item{project}{A vector of run IDs for each directory}
 
-\item{format}{The format of the data to be loaded. Either "cellranger" or "h5". Defaults to "cellranger"}
+\item{file_format}{The format of the data to be loaded. Either "cellranger" or "h5". Defaults to "cellranger"}
 
-\item{hto_pattern}{Prefix to identify HTO tag names if HTO library is present. Defaults to NULL}
-
-\item{denoise_adt}{If TRUE, denoise ADT counts using DSB normalization. Defaults to TRUE}
+\item{hto_prefix}{Prefix to identify HTO tag names if HTO library is present. Defaults to NULL}
 }
 \value{
 A list of Seurat objects, with each entry corresponding to a sample
 }
 \description{
-Creates a list of Seurat objects from 10x Genomics cellranger-multi outputs.
+Creates a list of Seurat objects from 10x Genomics cellranger/h5 outputs.
 This function processes RNA, ADT (Antibody-Derived Tags), and HTO (Hashtag Oligonucleotides)
-modalities if present in the cellranger outputs.
+modalities if present in the cellranger/h5 outputs.
 }

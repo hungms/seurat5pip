@@ -10,7 +10,7 @@ get_all_features(obj)
 \item{obj}{A Seurat object}
 }
 \value{
-A vector of all features from the Seurat object
+A vector of all features from the Seurat object, with assay keys included in vector names
 }
 \description{
 This function returns a vector of all features from a Seurat object, including

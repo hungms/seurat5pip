@@ -7,11 +7,13 @@
 get_assay_keys(obj)
 }
 \arguments{
-\item{obj}{Seurat object}
+\item{obj}{A Seurat object}
 }
 \value{
-A vector of assay keys
+A named vector of assay keys
 }
 \description{
-Get assay keys from a Seurat object
+Retrieves all assay keys from a Seurat object.
+This function extracts the key attribute from each assay in the Seurat object.
 }
+\keyword{internal}

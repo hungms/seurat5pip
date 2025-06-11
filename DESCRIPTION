@@ -20,5 +20,6 @@ Imports:
     stringr,
     stats,
     magrittr,
-    rlang
+    rlang,
+    progress
 Remotes: hungms/plotr, hungms/strpip, hungms/deseq2pip, alserglab/mascarade

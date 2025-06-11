@@ -7,11 +7,12 @@
 join_layers(obj)
 }
 \arguments{
-\item{obj}{Seurat object}
+\item{obj}{A Seurat object containing one or more Assay5 objects}
 }
 \value{
-Seurat object
+The Seurat object with all Assay5 layers joined
 }
 \description{
-Join layers for all Assay5 objects in a Seurat object
+Joins all layers for each Assay5 object in a Seurat object.
+This function identifies all assays of class Assay5 and applies JoinLayers to each one.
 }

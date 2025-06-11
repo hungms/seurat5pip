@@ -78,6 +78,24 @@ subset_vdj_features <- function(obj, assay, bcr = T, tcr = T){
     
     return(obj)}
 
+
+#' remove_features
+#'
+#' remove features from a Seurat object
+#' @param obj Seurat object
+#' @param features a vector of features to remove
+#' @export
+remove_features <- function(obj, assay, features){
+
+    # 
+    stopifnot(class(obj[[assay]]) == "Assay5")
+
+    # remove features
+    obj <- obj[-index.to.remove]
+
+    return(obj)}
+
+
 #' intersect_features
 #'
 #' intersect common features between a list of seurat objects
@@ -88,7 +106,7 @@ subset_vdj_features <- function(obj, assay, bcr = T, tcr = T){
 intersect_features <- function(obj, split.by, assay){
 
     # split object
-    obj.list <- split_obj(obj, split.by)
+    obj.list <- split_object(obj, split.by)
 
     # initialize list
     intersect.list <- list()

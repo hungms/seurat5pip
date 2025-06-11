@@ -4,17 +4,13 @@
 \alias{remove_features}
 \title{remove_features}
 \usage{
-remove_features(obj, features = NULL, from.assay = "RNA", to.assay)
+remove_features(obj, assay, features)
 }
 \arguments{
 \item{obj}{Seurat object}
 
-\item{features}{a vector features to remove}
-
-\item{from.assay}{current assay name, defaults to "RNA"}
-
-\item{to.assay}{new assay name to store removed features}
+\item{features}{a vector of features to remove}
 }
 \description{
-Remove features from current assay to new assay
+remove features from a Seurat object
 }
