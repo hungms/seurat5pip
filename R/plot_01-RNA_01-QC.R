@@ -12,6 +12,7 @@ plot_qc <- function(obj, qc_mode = NULL, split.by = NULL, output_dir = NULL){
     split.by <- validate_split.by(split.by, obj)
     var = c("nFeature_RNA", "nCount_RNA", "percent.hb", "percent.mt", "percent.rb", "percent.bcr", "percent.tcr")
     cols_to_check <- c(split.by, var)
+    
     stopifnot(all(cols_to_check %in% colnames(obj@meta.data)))
     metadata <- obj@meta.data
 
@@ -95,35 +96,51 @@ plot_qc <- function(obj, qc_mode = NULL, split.by = NULL, output_dir = NULL){
 
         plot_rows <- plot_grid(p2, p3, p4, p5, ncol = 4, align = "vh")
         scatter[[i]] <- plot_grid(title, plot_rows, ncol = 1, rel_heights = c(0.1, 1), align = "v")
+
+        boxplot_dir <- paste0("plot_qc_boxplot", gsub("qc", "", qc_mode))
+        scatter_dir <- paste0("plot_qc_scatter", gsub("qc", "", qc_mode))
+        dir.create(paste0(output_dir, "/", boxplot_dir), recursive = T)
+        dir.create(paste0(output_dir, "/", scatter_dir), recursive = T)
+
+        write_png(boxplot[[i]], output_dir = boxplot_dir, filename = paste0(levels[i], ".png"), width = 300, height = 200)
+        write_png(scatter[[i]], output_dir = scatter_dir, filename = paste0(levels[i], ".png"), width = 800, height = 200)
+
         plots[[i]] <- list(p1, p2, p3, p4, p5)
-    }
-
-
-    boxplot <- plot_grid(plotlist = boxplot, ncol = 1, align = "vh")
-    scatter <- plot_grid(plotlist = scatter, ncol = 1, align = "vh")
-
-    if(!is.null(output_dir) & dir.exists(output_dir)){
-
-        boxplot_name <- paste0(c("/plot_qc_boxplot", qc_mode), collapse = "_")
-        scatter_name <- paste0(c("/plot_qc_scatter", qc_mode), collapse = "_")
-
-        scale = length(levels)
-        Cairo::CairoPDF(paste0(output_dir, paste0(boxplot_name, ".pdf")), width = 30, height = 20 * scale, res = 300)
-        print(boxplot)
-        dev.off()
-
-        Cairo::CairoPDF(paste0(output_dir, paste0(scatter_name, ".pdf")), width = 80, height = 20 * scale, res = 300)
-        print(scatter)
-        dev.off()
     }
 
     names(plots) <- levels
     return(plots)
 
-
-
 }
 
+#' Plot cell count
+#'
+#' @param obj Seurat object
+#' @param split.by Metadata column to split the object by
+#' @param output_dir Directory to save the output
+#' @return ggplot object
+#' @export
+plot_qc_cell_count <- function(obj, split.by = NULL, output_dir = NULL){
 
+    split.by <- validate_split.by(split.by, obj)
+    plot <- obj@meta.data %>%
+        group_by(project) %>%
+        summarize(n = n()) %>%
+        ggplot(aes(x = project, y = n)) +
+        geom_text(aes(label = n), vjust = -0.5) +
+        geom_col(width = 0.85, position = "stack", linewidth = 0.9) +
+        labs(x = "Project", y = "No. of cells") +
+        ggprism::theme_prism(border = T) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
+    w.base = 300
+    h.base = 300
+    w.increment = 150
+    h.increment = 300
+    w = w.base + w.increment * length(unique(obj@meta.data$project))
+    h = h.base + (h.increment * nchar(plot$labels$x))
+
+    write_png(plot, output_dir = output_dir, "plot_qc_cell_count.png", width = w, height = h)
+}
 
 
