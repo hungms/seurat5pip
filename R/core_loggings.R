@@ -1,3 +1,36 @@
+#' Log renv
+#'
+#' @param project Path to start/restore renv project
+#' @return The renv
+#' @export
+log_renv <- function(project = getwd()){
+        
+        # check if project is a directory
+        stopifnot(dir.exists(project))
+
+        # create log directory
+        dir.create(paste0(project, "/00_LOG"), showWarnings = FALSE, 
+            recursive = TRUE)
+        
+        # check if renv is initialized
+        if (!dir.exists(paste0(project, "/00_LOG/renv"))) {
+            # log session info
+            message("renv not initialized, initializing renv")
+            writeLines(capture.output(sessionInfo()), paste0(project, "/00_LOG/sessionInfo.Rmd"))
+            # initialize renv
+            renv::init(project = paste0(project, "/00_LOG"), bare = TRUE, force = TRUE)
+            # snapshot renv
+            renv::snapshot(project = paste0(project, "/00_LOG"), prompt = FALSE)
+        }
+        else {
+            # log session info
+            message("renv already initialized, restoring renv")
+            writeLines(capture.output(sessionInfo()), paste0(project, "/00_LOG/sessionInfo.Rmd"))
+            # restore renv
+            renv::restore(project = paste0(project, "/00_LOG"), prompt = FALSE)
+        }
+}
+
 #' Log progress bar
 #'
 #' @param i The current iteration
