@@ -30,6 +30,8 @@ cc_by_seurat <- function(obj, split.by = NULL, assay = "RNA"){
     # merge objects
     obj <- merge_objects(obj.list)
 
+    obj$Phase <- factor(obj$Phase, levels = c("G1", "S", "G2M"))
+
     # log
     log_function()
 
