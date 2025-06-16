@@ -97,10 +97,10 @@ plot_qc <- function(obj, qc_mode = NULL, split.by = NULL, output_dir = NULL){
         plot_rows <- plot_grid(p2, p3, p4, p5, ncol = 4, align = "vh")
         scatter[[i]] <- plot_grid(title, plot_rows, ncol = 1, rel_heights = c(0.1, 1), align = "v")
 
-        boxplot_dir <- paste0("plot_qc_boxplot", gsub("qc", "", qc_mode))
-        scatter_dir <- paste0("plot_qc_scatter", gsub("qc", "", qc_mode))
-        dir.create(paste0(output_dir, "/", boxplot_dir), recursive = T)
-        dir.create(paste0(output_dir, "/", scatter_dir), recursive = T)
+        boxplot_dir <- paste0(output_dir, "/plot_qc_boxplot", gsub("qc", "", qc_mode))
+        scatter_dir <- paste0(output_dir, "/plot_qc_scatter", gsub("qc", "", qc_mode))
+        dir.create(boxplot_dir, recursive = T)
+        dir.create(scatter_dir, recursive = T)
 
         write_png(boxplot[[i]], output_dir = boxplot_dir, filename = paste0(levels[i], ".png"), width = 300, height = 200)
         write_png(scatter[[i]], output_dir = scatter_dir, filename = paste0(levels[i], ".png"), width = 800, height = 200)
