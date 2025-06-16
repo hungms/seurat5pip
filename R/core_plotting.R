@@ -14,7 +14,7 @@
 plot_percent <- function(df, group.by, var, split.by = NULL, pal = NULL, legend.ncol = 1, count = T, filename = NULL, output_dir = NULL){
     
     # validate arguments
-    stopifnot(c(group.by, var, split.by) %in% colnames(obj@meta.data))
+    stopifnot(c(group.by, var, split.by) %in% colnames(df))
     group <- c(group.by, split.by)
 
     # get metadata
