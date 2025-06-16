@@ -24,5 +24,23 @@ process_RNA_QC <- function(obj, assay = "RNA", split.by = NULL, output_dir = NUL
     return(obj)
 }
 
+#' Process cell cycle scoring
+#'
+#' @param obj Seurat object
+#' @param assay Assay to validate
+#' @param split.by Metadata column to split the object by
+#' @param output_dir Directory to save the output
+#' @return Seurat object
+process_RNA_CELLCYCLE <- function(obj, assay = "RNA", split.by = NULL, output_dir = NULL){
 
-#process_RNA_CELLCYCLE <- function(obj, assay = "RNA", split.by = NULL, output_dir = NULL){
+    # validate arguments
+    split.by <- validate_split.by(split.by, obj)
+
+    # cell cycle scoring
+    obj <- cc_by_seurat(obj, assay = assay, split.by = split.by)
+
+    # plot cell cycle
+    plot_cc(obj, var = "Phase", split.by = split.by, output_dir = output_dir)
+
+    return(obj)
+}
