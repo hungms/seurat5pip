@@ -70,14 +70,14 @@ create_seurat_object <- function(dir, project, file_format = "cellranger", hto_p
         # check if HTO assay is present
         has_hto <- FALSE
         if(has_adt){
-            has_hto <- any(str_detect(rownames(matrix_data$`Antibody Capture`), hto_pattern))
-            has_adt <- any(!(str_detect(rownames(matrix_data$`Antibody Capture`), hto_pattern)))}
+            has_hto <- any(str_detect(rownames(matrix_data$`Antibody Capture`), hto_prefix))
+            has_adt <- any(!(str_detect(rownames(matrix_data$`Antibody Capture`), hto_prefix)))}
 
        	# if HTO is present
         if(has_hto){
 
             # extract HTO from ADT assay
-            hto_data <- matrix_data$`Antibody Capture`[which(str_detect(rownames(matrix_data$`Antibody Capture`), hto_pattern)),]
+            hto_data <- matrix_data$`Antibody Capture`[which(str_detect(rownames(matrix_data$`Antibody Capture`), hto_prefix)),]
 
             # create HTO assay
             obj[["HTO"]] <- CreateAssay5Object(
@@ -91,7 +91,7 @@ create_seurat_object <- function(dir, project, file_format = "cellranger", hto_p
             # remove HTO from ADT assay
             adt_data <- matrix_data$`Antibody Capture`
             if(has_hto){
-                adt_data <- adt_data[-which(str_detect(rownames(adt_data), hto_pattern)), ]}
+                adt_data <- adt_data[-which(str_detect(rownames(adt_data), hto_prefix)), ]}
             
             # create ADT assay
             obj[["ADT"]] <- CreateAssay5Object(
@@ -131,11 +131,11 @@ create_seurat_object <- function(dir, project, file_format = "cellranger", hto_p
     # logging
     m1 <- paste("project = ", paste0(project, collapse = ", "))
     m2 <- paste("Number of cells = ", sum(sapply(obj.list, function(x) ncol(x))))
-    m3 <- paste("Number of RNA features = ", sum(sapply(obj.list, function(x) nrow(x[["RNA"]]))))
-    m4 <- paste("Number of ADT features = ", sum(sapply(obj.list, function(x) nrow(x[["ADT"]]))))
-    m5 <- paste("Number of HTO features = ", sum(sapply(obj.list, function(x) nrow(x[["HTO"]]))))
-    m6 <- paste("Number of common features = ", length(intersect_features(obj.list)))
-    log_function(m1, m2, m3, m4, m5, m6)
+    m3 <- paste("Number of RNA features = ", sum(sapply(obj.list, function(x) if(!"RNA" %in% names(x@assays)){0} else {nrow(x[["RNA"]])})))
+    m4 <- paste("Number of ADT features = ", sum(sapply(obj.list, function(x) if(!"ADT" %in% names(x@assays)){0} else {nrow(x[["ADT"]])})))
+    m5 <- paste("Number of HTO features = ", sum(sapply(obj.list, function(x) if(!"HTO" %in% names(x@assays)){0} else {nrow(x[["HTO"]])})))
+    #m6 <- paste("Number of common features = ", length(intersect_features(obj, split.by = "project")))
+    log_function(m1, m2, m3, m4, m5)
     
     # return object
     print(obj.list)
