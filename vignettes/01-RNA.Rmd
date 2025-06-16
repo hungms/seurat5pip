@@ -1,0 +1,66 @@
+
+
+
+```{r}
+library(Seurat)
+library(SeuratData)
+library(patchwork)
+library(strpip)
+library(seurat5pip)
+```
+
+```{r}
+data("pbmcsca")
+obj <- UpdateSeuratObject(pbmcsca)
+obj$project <- "pbmcsca" # project name
+```
+
+
+## 01-QC
+```{r}
+filtered_obj <- process_RNA_QC(obj, assay = "RNA", split.by = "project", output_dir = "test/pipeline/01-RNA/01a-QC/")
+```
+
+
+```{r}
+# process_RNA_QC - subprocesses
+#===============================================
+# arguments in process_RNA_QC
+# assay = "RNA"
+# split.by = NULL
+# var = c("percent.mt", "percent.hb")
+# output_dir = "test/pipeline/01-RNA/01-QC/"
+
+# remove empty droplets & lowly expressed genes
+# obj <- qc_by_standard(obj, split.by = split.by, output_dir = output_dir)
+
+# calculate feature percentages
+# obj <- qc_find_percentages(obj, assay = assay)
+
+# identify outlier cells
+# obj <- qc_by_mad(obj, assay = assay, split.by = split.by, var = var, output_dir = output_dir)
+
+# plot qc plots per object
+# p1 <- plot_qc(obj, split.by = split.by, output_dir = output_dir)
+# p2 <- plot_qc(obj, qc_mode = "mad", split.by = split.by, output_dir = output_dir)
+# p1 + p2
+```
+
+
+
+## 02-CELLCYCLE
+```{r}
+# cell cycle scoring
+filtered_obj <- process_RNA_CELLCYCLE(filtered_obj, split.by = "project", output_dir = "test/pipeline/01-RNA/01b-CELLCYCLE/")
+```
+
+```{r}
+# plot cell cycle
+filtered_obj <- cc_by_seurat(filtered_obj)
+filtered_obj <- plot_cc(filtered_obj, split.by = NULL, output_dir = "test/pipeline/01-RNA/01b-CELLCYCLE/")
+```
+
+```{r}
+# write matrix
+write_matrix(filtered_obj, assay = "RNA", dir = "test/pipeline/01-RNA/00-OUTPUT/")
+```
