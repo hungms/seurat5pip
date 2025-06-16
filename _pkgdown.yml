@@ -1,0 +1,59 @@
+url: https://hungms.github.io/seurat5pip/
+
+authors:
+  Matthew Hung:
+    href: https://hungms.github.io/Portfolio/
+
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+development:
+  mode: auto
+
+navbar:
+  structure:
+    left:
+    - intro
+    - articles
+    - reference
+    - tutorials
+    - news
+    right:
+    - search
+    - github
+    - lightswitch
+  components:
+    articles:
+      text: "Vignettes"
+      menu:
+      - text: "Quick Start"
+        href: articles/20241203.html
+      - text: "Ipynb"
+        href: articles/20241206.html
+
+reference:
+- title: Core Objects
+  contents:
+  - matches("create_seurat_object")
+- title: Core Assays
+  contents:
+  - matches("join_layers")
+  - matches("merge_features")
+- title: Core Features
+  contents:
+  - matches("get_all_features")
+  - matches("subset_features")
+  - matches("remove_features")
+  - matches("return_features")
+- title: Plot Functions
+  contents:
+  - matches("dotplot")
+  - matches("reduction")
+- title: Save Functions
+  contents:
+
+- title: Internal
+  contents:
+  - matches("set_assay_keys")
+  - matches("get_assay_keys")

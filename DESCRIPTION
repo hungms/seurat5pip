@@ -1,0 +1,30 @@
+Package: seurat5pip
+Title: 
+Version: 0.0.0
+Authors@R: 
+    person(given = "Miu Shing", family = "Hung", email = "matthewhungms@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0009-0004-0412-4374"))
+Description: Unification of single-cell multi-modal processing and visualization tools.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+URL: https://hungms.github.io/scUnify/
+LazyData: true
+Depends: 
+    qs,
+    R (>= 4.0.0),
+    Seurat (>= 5.0.0),
+Imports:
+    MASS,
+    stats,
+    ggpubr,
+    magrittr,
+    rlang,
+    ggprism,
+    Seurat,
+    qs,
+    deseq2pip,
+    strpip,
+    mascarade,
+    ggprism,
+Remotes: hungms/plotr, hungms/strpip, hungms/deseq2pip, alserglab/mascarade
