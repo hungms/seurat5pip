@@ -9,8 +9,8 @@ qc_by_standard(
   split.by = NULL,
   assay = "RNA",
   min.features = 200,
-  min.pct = 0.01,
-  min.cells = NULL,
+  min.pct = NULL,
+  min.cells = 5,
   output_dir = NULL
 )
 }

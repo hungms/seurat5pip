@@ -9,7 +9,7 @@
 #' @param min.cells Minimum number of cells expressing a feature
 #' @return Seurat object
 #' @export
-qc_by_standard <- function(obj, split.by = NULL, assay = "RNA", min.features = 200, min.pct = 0.01, min.cells = NULL, output_dir = NULL){
+qc_by_standard <- function(obj, split.by = NULL, assay = "RNA", min.features = 200, min.pct = NULL, min.cells = 5, output_dir = NULL){
 
     # validate min.pct and min.cells
     stopifnot(is.null(min.cells) != is.null(min.pct))
