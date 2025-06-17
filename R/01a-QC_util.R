@@ -37,7 +37,7 @@ qc_by_standard <- function(obj, split.by = NULL, assay = "RNA", min.features = 2
             # create new assay
             obj.list[[o]][[assay]] <- CreateAssay5Object(
                 counts = obj.list[[o]][[assay]]$counts[features.to.keep, ], 
-                data = obj.list[[o]][[assay]]$data[features.to.keep, ], 
+                #data = obj.list[[o]][[assay]]$data[features.to.keep, ], 
                 min.cells = 0)
             
             # min.cells.message
@@ -50,7 +50,7 @@ qc_by_standard <- function(obj, split.by = NULL, assay = "RNA", min.features = 2
             # create new assay
             obj.list[[o]][[assay]] <- CreateAssay5Object(
                 counts = obj.list[[o]][[assay]]$counts, 
-                data = obj.list[[o]][[assay]]$data, 
+                #data = obj.list[[o]][[assay]]$data, 
                 min.cells = min.cells)
             
             # min.cells.message
