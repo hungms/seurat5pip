@@ -102,8 +102,8 @@ plot_qc <- function(obj, qc_mode = NULL, split.by = NULL, output_dir = NULL){
         dir.create(boxplot_dir, recursive = T)
         dir.create(scatter_dir, recursive = T)
 
-        write_png(boxplot[[i]], output_dir = boxplot_dir, filename = paste0(levels[i], ".png"), width = 300, height = 200)
-        write_png(scatter[[i]], output_dir = scatter_dir, filename = paste0(levels[i], ".png"), width = 800, height = 200)
+        write_png(boxplot[[i]], output_dir = boxplot_dir, filename = paste0(levels[i], ".png"), width = 3000, height = 1200)
+        write_png(scatter[[i]], output_dir = scatter_dir, filename = paste0(levels[i], ".png"), width = 6000, height = 1200)
 
         plots[[i]] <- list(p1, p2, p3, p4, p5)
     }
@@ -116,31 +116,57 @@ plot_qc <- function(obj, qc_mode = NULL, split.by = NULL, output_dir = NULL){
 #' Plot cell count
 #'
 #' @param obj Seurat object
+#' @param qc_mode QC mode to plot
 #' @param split.by Metadata column to split the object by
 #' @param output_dir Directory to save the output
 #' @return ggplot object
 #' @export
-plot_qc_cell_count <- function(obj, split.by = NULL, output_dir = NULL){
+plot_qc_cell_count <- function(obj, qc_mode = NULL, split.by = NULL, output_dir = NULL){
 
     split.by <- validate_split.by(split.by, obj)
+
+    if(!is.null(qc_mode)){
+        stopifnot(qc_mode %in% c("manual", "mad"))
+        group_cols <- c(split.by, paste0("qc_by_", qc_mode))}
+    else{
+        group_cols <- c(split.by)}
+    
     plot <- obj@meta.data %>%
-        group_by(project) %>%
+        group_by_at(group_cols) %>%
         summarize(n = n()) %>%
         ggplot(aes(x = project, y = n)) +
-        geom_text(aes(label = n), vjust = -0.5) +
-        geom_col(width = 0.85, position = "stack", linewidth = 0.9) +
         labs(x = "Project", y = "No. of cells") +
-        ggprism::theme_prism(border = T) +
+        ggprism::theme_prism(border = F) +
+        scale_y_continuous(
+            guide = "prism_offset",
+            expand = expansion(mult = c(0, 0.075))) +
+        guides(y = "prism_offset_minor") +
         theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+        
 
-    w.base = 300
-    h.base = 300
-    w.increment = 150
-    h.increment = 300
-    w = w.base + w.increment * length(unique(obj@meta.data$project))
-    h = h.base + (h.increment * nchar(plot$labels$x))
+    if(!is.null(qc_mode)){
+        plot <- plot +
+            geom_col(aes(fill = !!sym(paste0("qc_by_", qc_mode))), width = 0.85, stat = "identity", position = "stack", linewidth = 0.9) +
+            geom_text(aes(fill = !!sym(paste0("qc_by_", qc_mode)), label = n), position = position_stack(vjust = 0.5))
+        plotname = paste0("plot_qc_cell_count_", qc_mode, ".png")}
+    else{
+        plot <- plot +
+            geom_col(width = 0.85, position = "stack", linewidth = 0.9) +
+            geom_text(aes(label = n), vjust = -0.5)
+        plotname = paste0("plot_qc_cell_count.png")}
+    
 
-    write_png(plot, output_dir = output_dir, "plot_qc_cell_count.png", width = w, height = h)
+    if(!is.null(output_dir)){
+        group.levels = unique(obj@meta.data[[split.by]])
+        w.base = 800
+        h.base = 800
+        w.increment = 150
+        h.increment = 50
+        h.scale <- max(nchar(as.character(group.levels)))
+        h.scale <- ifelse(h.scale < 10, 10, h.scale)
+        w = w.base + (w.increment * length(group.levels))
+        h = h.base + (h.increment * h.scale)
+
+        write_png(plot, output_dir = output_dir, plotname, width = w, height = h)}
 }
-
 
