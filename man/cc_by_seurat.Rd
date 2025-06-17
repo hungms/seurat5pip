@@ -2,9 +2,9 @@
 % Please edit documentation in R/01b-CELLCYCLE_util.R
 \name{cc_by_seurat}
 \alias{cc_by_seurat}
-\title{Calculate cell cycle phase}
+\title{Calculate cell cycle phase with Seurat}
 \usage{
-cc_by_seurat(obj, split.by = NULL, assay = "RNA")
+cc_by_seurat(obj, split.by = NULL, assay = "RNA", output_dir = NULL)
 }
 \arguments{
 \item{obj}{Seurat object}
