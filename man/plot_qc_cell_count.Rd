@@ -4,10 +4,12 @@
 \alias{plot_qc_cell_count}
 \title{Plot cell count}
 \usage{
-plot_qc_cell_count(obj, split.by = NULL, output_dir = NULL)
+plot_qc_cell_count(obj, qc_mode = NULL, split.by = NULL, output_dir = NULL)
 }
 \arguments{
 \item{obj}{Seurat object}
+
+\item{qc_mode}{QC mode to plot}
 
 \item{split.by}{Metadata column to split the object by}
 
