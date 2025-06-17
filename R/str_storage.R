@@ -27,6 +27,7 @@ write_matrix <- function(obj, assay, dir){
 #' @param filename The name of the plot
 #' @param ... Additional arguments to pass to the png function
 #' @return None. Creates a png file in the specified directory
+#' @export
 write_png <- function(plot, output_dir, filename, ...){
 
     stopifnot(all(is.character(c(output_dir, filename))))
