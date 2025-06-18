@@ -170,3 +170,59 @@ plot_qc_cell_count <- function(obj, qc_mode = NULL, split.by = NULL, output_dir 
         write_png(plot, output_dir = output_dir, plotname, width = w, height = h)}
 }
 
+
+#' Plot feature percentages
+#'
+#' @param obj Seurat object
+#' @param assay Assay name
+#' @param threshold Threshold for each feature
+#' @param split.by Metadata column to split the object by
+#' @param output_dir Directory to save the output
+#' @return List of plots
+#' @export
+plot_feature_percentages <- function(obj, assay = "RNA", threshold = NULL, split.by = NULL, output_dir = NULL){
+
+    assay_var <- paste0(c("nCount_", "nFeature_"), assay)
+    var<- c(assay_var, "percent.mt", "percent.hb", "percent.rb", "percent.bcr", "percent.tcr", "percent.mhc")
+
+    stopifnot(all(var %in% colnames(obj@meta.data)))
+
+    if(!is.null(threshold)){
+        stopifnot(all(names(threshold) %in% var))
+        stopifnot(all(is.numeric(threshold)))}
+
+    plist <- list()
+
+    for(i in seq_along(var)){
+        p <- obj@meta.data %>% 
+            ggplot(aes(x = !!sym(split.by), y = !!sym(var[i]))) +
+            geom_violin(aes(fill = !!sym(split.by)), linewidth = 0.9) +
+            ggprism::theme_prism(border = T) +
+            labs(x = split.by, y = NULL, title = var[i]) +
+            theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+        if(!is.null(threshold)){
+            p <- p +
+                geom_hline(yintercept = threshold[var[i]], color = "black", linetype = "dashed")}
+
+        plist[[i]] <- p
+
+        dir.create(paste0(output_dir, "/plot_feature_percentages/"), showWarnings = F, recursive = T)
+
+        if(!is.null(output_dir)){
+            group.levels = unique(obj@meta.data[[split.by]])
+            w.base = 1000
+            h.base = 800
+            w.increment = 150
+            h.increment = 50
+            h.scale <- max(nchar(as.character(group.levels)))
+            h.scale <- ifelse(h.scale < 10, 10, h.scale)
+            w = w.base + (w.increment * length(group.levels))
+            h = h.base + (h.increment * h.scale)
+        
+            write_png(plist, output_dir = paste0(output_dir, "/plot_feature_percentages/"), filename = paste0(var[i], ".png"), width = w, height = h)}
+    }
+    return(plist)
+}
+
+
