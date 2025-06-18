@@ -44,61 +44,66 @@ cc_by_seurat <- function(obj, split.by = NULL, assay = "RNA", output_dir = NULL)
 
 
 #' Calculate cell cycle phase with tricycle
-#' 
-cc_by_tricycle <- function(obj, assay = "RNA", output_dir = NULL){
+#'
+#' This function calculates the cell cycle phase with tricycle.
+#' @param obj Seurat object
+#' @param org Organism, either "human" or "mouse"
+#' @param assay assay name, defaults to "RNA"
+#' @param output_dir output directory
+#' @return Seurat object
+#' @export
+cc_by_tricycle <- function(obj, split.by = NULL, assay = "RNA", output_dir = NULL){
 
     # get organism
     org <- get_org(obj, assay)
+    split.by <- validate_split.by(split.by, obj)
 
-    # scale data
-    if(!"data" %in% Layers(obj, assay = assay)){
-        obj <- NormalizeData(obj, assay = assay)
-    }
-    if(!"scale.data" %in% Layers(obj, assay = assay)){
-        obj <- ScaleData(obj, assay = assay)
-    }
+    obj.list <- SplitObject(obj, split.by = split.by)
 
-    # convert to SingleCellExperiment object
-    sce <- as.SingleCellExperiment(obj, assay = assay)
-    print(sce)
+    toAddlist <- list()
 
-    # create SingleCellExperiment object
-    sce <- tricycle::project_cycle_space(sce, species = org, gname.type = "SYMBOL")
-    sce <- tricycle::estimate_cycle_position(sce)
-    p1 <- scater::plotReducedDim(sce, dimred = "tricycleEmbedding", colour_by = "tricyclePosition") +
-        labs(x = "PC1", y = "PC2", title = "tricyclePosition") +
-        ggprism::theme_prism(border = T) +
-        coord_fixed()
+    for(i in seq_along(obj.list)){
+        tmp <- obj.list[[i]]
 
-    #top2a.idx <- which(rowData(sce)$Gene %in% c('Top2a', 'TOP2A'))
-    #fit.l <- tricycle::fit_periodic_loess(
-    #    sce$tricyclePosition,
-    #    assay(sce, 'logcounts')[top2a.idx,],
-    #    plot = TRUE,
-   #     x_lab = "Cell cycle position", y_lab = "log2(Top2a)")
-   # p2 <- fit.l$fig + ggprism::theme_prism(border = T)
+        # scale data
+        stopifnot(all(c("data", "scale.data") %in% Layers(tmp, assay = assay)))
 
-    sce <- tricycle::estimate_Schwabe_stage(sce, gname.type = "SYMBOL", species = org)
-    p3 <- scater::plotReducedDim(sce, dimred = "tricycleEmbedding", colour_by = "CCStage") +
-        labs(x = "PC1", y = "PC2", title = "CCStage") +
-        ggprism::theme_prism(border = T) +
-        coord_fixed()
+        # convert to SingleCellExperiment object
+        sce <- as.SingleCellExperiment(tmp, assay = assay)
+        print(sce)
 
-    p4 <- tricycle::plot_emb_circle_scale(sce, dimred = 1,
-        point.size = 3.5, point.alpha = 0.9) +
-        ggprism::theme_prism(border = T) + 
-        coord_fixed()
-    legend <- tricycle::circle_scale_legend(text.size = 5, alpha = 0.9)
-    p4 <- plot_grid(p4, legend, ncol = 2, rel_widths = c(1, 0.4))
+        # run tricycle
+        sce <- tricycle::project_cycle_space(sce, species = org, gname.type = "SYMBOL")
+        sce <- tricycle::estimate_cycle_position(sce)
+        sce <- tricycle::estimate_Schwabe_stage(sce, species = org, gname.type = 'SYMBOL')
 
-    # save plots
-    write_png(p1, output_dir = output_dir, filename = "tricycle_position.png", width = 1500, height = 1200)
-    #write_png(p2, output_dir = output_dir, filename = "tricycle_TOP2A.png", width = 1200, height = 1000)
-    write_png(p3, output_dir = output_dir, filename = "tricycle_CCstage.png", width = 1500, height = 1200)
-    write_png(p4, output_dir = output_dir, filename = "tricycle_circle.png", width = 1800, height = 1500)
+        p1 <- scater::plotReducedDim(sce, dimred = "tricycleEmbedding", colour_by = "tricyclePosition") +
+            labs(x = "PC1", y = "PC2", title = "tricyclePosition") +
+            ggprism::theme_prism(border = T) +
+            coord_fixed()
+
+        p2 <- scater::plotReducedDim(sce, dimred = "tricycleEmbedding", colour_by = "CCStage") +
+            labs(x = "PC1", y = "PC2", title = "CCStage") +
+            ggprism::theme_prism(border = T) +
+            coord_fixed()
+
+        p3 <- tricycle::plot_emb_circle_scale(sce, dimred = 1,
+            point.size = 3.5, point.alpha = 0.9) +
+            ggprism::theme_prism(border = T) + 
+            coord_fixed()
+        legend <- tricycle::circle_scale_legend(text.size = 5, alpha = 0.9)
+        p3 <- plot_grid(p3, legend, ncol = 2, rel_widths = c(1, 0.4))
 
 
-    toAdd <- data.frame(row.names = rownames(sce@colData), tricyclePosition = sce@colData$tricyclePosition, CCStage = sce@colData$CCStage)
+        # save plots
+        dir.create(paste0(output_dir, "/", names(obj.list)[i], "/"), showWarnings = F, recursive = T)
+        write_png(p1, output_dir = paste0(output_dir, "/", names(obj.list)[i], "/"), filename = "tricycle_position.png", width = 1500, height = 1200)
+        write_png(p2, output_dir = paste0(output_dir, "/", names(obj.list)[i], "/"), filename = "tricycle_CCstage.png", width = 1500, height = 1200)
+        write_png(p3, output_dir = paste0(output_dir, "/", names(obj.list)[i], "/"), filename = "tricycle_circle.png", width = 1800, height = 1500)
+
+        toAddlist[[i]] <- data.frame(row.names = rownames(sce@colData), tricyclePosition = sce@colData$tricyclePosition, CCStage = sce@colData$CCStage)}
+
+    toAdd <- bind_rows(toAddlist)
     write.csv(toAdd, file.path(output_dir, "seuratobj_metadata_tricycle.csv"))
 
     # add metadata
