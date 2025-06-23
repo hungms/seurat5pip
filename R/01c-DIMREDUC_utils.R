@@ -68,7 +68,7 @@ run_pca <- function(obj, reduction = "pca", output_dir = NULL){
     write.csv(pca_loadings, file = paste0(output_dir, "/", reduction, "/loadings.csv"))
 
     # save variance
-    pca_variance <- data.frame(row.names = paste0("PC", 1:50), cumsum(obj[[reduction]]@stdev^2) / sum(obj[[reduction]]@stdev^2))
+    pca_variance <- data.frame(row.names = paste0("PC", 1:50), obj[[reduction]]@stdev^2 / sum(obj[[reduction]]@stdev^2))
     write.csv(pca_variance, file = paste0(output_dir, "/", reduction, "/variance.csv"))
 
     # plot elbow, feature loadings, and PCA

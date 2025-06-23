@@ -259,7 +259,7 @@ plot_reduction <- function(obj, reduction = "umap", reduction.type = "UMAP", gro
 
     # add pca variance
     if(reduction.type == "PCA"){
-        pca_variance <- cumsum(obj[[reduction]]@stdev^2)*100 / sum(obj[[reduction]]@stdev^2)
+        pca_variance <- 100*obj[[reduction]]@stdev^2 / sum(obj[[reduction]]@stdev^2)
         plot <- plot +
             labs(x = paste0("PCA (", round(pca_variance[1], 2), "% variance)"), y = paste0("PCA (", round(pca_variance[2], 2), "% variance)"))}
 
