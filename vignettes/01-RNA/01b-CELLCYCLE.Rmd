@@ -1,0 +1,18 @@
+
+
+## 02-CELLCYCLE
+```{r}
+# cell cycle scoring
+filtered_obj <- process_RNA_CELLCYCLE(filtered_obj, split.by = "project", output_dir = "test/pipeline/01-RNA/01b-CELLCYCLE/")
+```
+
+```{r}
+# plot cell cycle
+filtered_obj <- cc_by_seurat(filtered_obj)
+plot <- plot_cc(filtered_obj, split.by = NULL, output_dir = "test/pipeline/01-RNA/01b-CELLCYCLE/seurat/")
+```
+
+```{r}
+# write matrix
+filtered_obj <- cc_by_tricycle(filtered_obj, output_dir = "test/pipeline/01-RNA/01b-CELLCYCLE/tricycle/")
+```

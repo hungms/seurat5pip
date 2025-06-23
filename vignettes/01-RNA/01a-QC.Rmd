@@ -1,0 +1,176 @@
+## Load libraries
+
+```{r}
+library(SeuratData)
+library(seurat5pip)
+```
+
+## Load example PBMC dataset
+
+We will load the example PBMC dataset from the SeuratData package. We will need to update the object for compatibility with Seurat5.
+```{r}
+data("pbmcsca")
+obj <- UpdateSeuratObject(pbmcsca)
+```
+
+The example dataset is a Seurat object of 2 sequencing runs with a total of 33694 features across 31021 cells.
+```{r}
+# check object
+obj
+head(obj)
+```
+
+
+## Specify input arguments
+To run the pipeline, we need a "project" column in the Seurat object metadata to specify each single-cell sequencing run. 
+
+This information is currently stored in the "Experiment" column for this example dataset, so we will add a "project" column to the Seurat object metadata. 
+
+"project" column is required to run the pipeline, even if there is only one sequencing run present.
+```{r}
+obj$project <- obj$Experiment
+split.by <- "project" # metadata column to split the object by each single-cell sequencing run
+
+# add project name even if only one sequencing run is present
+### obj$project <- "pbmcsca"
+### split.by <- "project"
+```
+
+We will also need to specify the assay name storing the raw gene expression counts and output directory.
+
+```{r}
+assay = "RNA" # assay name in Seurat object
+output_dir = "test/pipeline/01-RNA/01a-QC/" # output directory
+```
+
+
+## Standard quality control
+We will first remove empty droplets & lowly expressed genes. By default, we will remove genes that are expressed in less than 5 cells (min.cells = 5) from each sequencing run. Alternative to min.cells, we can also remove genes that have a percentage of expression in less than 0.1% (min.pct = 0.001) from each sequencing run.
+
+```{r}
+# remove empty droplets & lowly expressed genes
+obj <- qc_by_standard(obj, split.by = split.by, min.features = 200, min.cells = 5, min.pct = NULL, output_dir = output_dir)
+
+# alternatively, we can remove genes that have a percentage of expression in less than 0.1% (min.pct = 0.001)
+### obj <- qc_by_standard(obj, split.by = split.by, min.features = 200, min.cells = NULL, min.pct = 0.001, output_dir = output_dir)
+```
+
+The object now contains 23099 features across 28985 samples.
+```{r}
+# check object
+obj
+head(obj)
+```
+
+
+We can plot the cell count per sequencing run.
+```{r}
+p1 <- plot_qc_cell_count(obj, qc_mode = NULL, split.by = split.by, output_dir = paste0(output_dir, "/standard/"))
+```
+![cell count](test/pipeline/01-RNA/01a-QC/standard/plot_qc_cell_count.png)
+
+
+## Calculate feature percentages
+Single cell sequencing typically contains a high percentage of empty droplets, poor quality and dead cells, which will affect downstream analysis. 
+
+We can detect and remove these cells by looking for various sets of genes (features).
+
+For example, we can remove cells with:
+
+* nFeature & nCount - indicates empty droplets (low nFeature & nCount) or doublets (high nFeature & nCount).
+* High % of reads associated with mitochondrial genes (percent.mt) - indicates that the cell is dead or dying. Cells are typically removed if percent.mt > 5% for mouse and > 10% for human.
+* High % of reads associated with hemoglobin genes (percent.hb) - indicates that the cell is a red blood cell if we are interested in immune cells. Typically set the threshold at 0% or 1% if the sample contains many red blood cells (ie. blood samples).
+
+Additional variables can be included to perform QC, which can be included depending on the specific question/dataset. For example:
+
+* Low % of reads associated with ribosomal genes (percent.rb) - indicates dying cells with little protein synthesis.
+* High % of reads associated with TCR genes (percent.tcr) - indicates T-cells if they are not the cell of interest. Typically set at 0.05% to remove T-cells.
+* High % of reads associated with BCR genes (percent.bcr) - indicates B-cells if they are not the cell of interest. Typically set at 1% to remove B-cells.
+
+We will first calculate the variables mentioned above per cell (percent.mt, percent.hb, percent.rb, percent.tcr, percent.bcr, percent.mhc).
+
+```{r}
+# calculate feature percentages
+obj <- qc_find_percentages(obj, assay = assay)
+head(obj)
+```
+
+
+We can visualize the relationship between variables in each sequencing run to determine outlier cells to remove.
+```{r}
+p2 <- plot_qc(obj, qc_mode = NULL, split.by = split.by, output_dir = paste0(output_dir, "/standard/"))
+```
+
+![boxplot for pbmc1](test/pipeline/01-RNA/01a-QC/standard/plot_qc_boxplot/pbmc1.png)
+![boxplot for pbmc2](test/pipeline/01-RNA/01a-QC/standard/plot_qc_boxplot/pbmc2.png)
+![scatterplot for pbmc1](test/pipeline/01-RNA/01a-QC/standard/plot_qc_scatter/pbmc1.png)
+![scatterplot for pbmc2](test/pipeline/01-RNA/01a-QC/standard/plot_qc_scatter/pbmc2.png)
+
+
+We can also compare the variables 
+```{r}
+p3 <- plot_feature_percentages(obj, output_dir = paste0(output_dir, "/standard/"))
+```
+
+
+
+## Remove outlier cells manually
+
+
+
+
+
+
+```{r}
+# plot qc plots per object
+p4 <- plot_qc_cell_count(obj, qc_mode = "mad", split.by = split.by, output_dir = paste0(output_dir, "/mad/"))
+p5 <- plot_qc(obj, qc_mode = "mad", split.by = split.by, output_dir = paste0(output_dir, "/mad/"))
+```
+
+
+
+## Remove outlier cells by median absolute deviation (MAD)
+
+```{r}
+# remove outlier cells by MAD
+obj <- qc_by_mad(obj, assay = assay, split.by = split.by, var = c("percent.mt", "percent.hb"), dev = 5, output_dir = paste0(output_dir, "/mad/"))
+obj$qc_by_mad %>% table(.)
+```
+
+```{r}
+thresholds <- read.csv(paste0(output_dir, "/mad/qc_by_mad_threshold.csv"))
+thresholds
+```
+
+```{r}
+stats <- read.csv(paste0(output_dir, "/mad/qc_by_mad_stats.csv"))
+stats
+```
+
+```{r}
+# plot qc plots per object
+p6 <- plot_qc_cell_count(obj, qc_mode = "mad", split.by = split.by, output_dir = paste0(output_dir, "/mad/"))
+p7 <- plot_qc(obj, qc_mode = "mad", split.by = split.by, output_dir = paste0(output_dir, "/mad/"))
+```
+
+
+
+
+
+
+## Calculate feature percentages
+```{r}
+# calculate feature percentages
+obj <- qc_find_percentages(obj, assay = assay)
+```
+```{r}
+# identify outlier cells
+obj <- qc_by_mad(obj, assay = assay, split.by = split.by, var = var, output_dir = output_dir)
+```
+
+```{r}
+# plot qc plots per object
+p1 <- plot_qc(obj, split.by = split.by, output_dir = output_dir)
+p2 <- plot_qc(obj, qc_mode = "mad", split.by = split.by, output_dir = output_dir)
+p1 + p2
+```

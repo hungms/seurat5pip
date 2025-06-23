@@ -1,0 +1,13 @@
+core_assays = T
+core_features = T
+core_loggings = T
+core_objects = T
+core_storage = 
+core_validations = T
+process_00-LOG = 
+process_01-RNA = 
+process_02-HTO = 
+to be edited
+utils_01-RNA_01-QC = 
+utils_01-RNA_02-CELLCYCLE = 
+zzz = 
