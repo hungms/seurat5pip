@@ -185,6 +185,7 @@ plot_feature_percentages <- function(obj, assay = "RNA", threshold = NULL, split
     assay_var <- paste0(c("nCount_", "nFeature_"), assay)
     var<- c(assay_var, "percent.mt", "percent.hb", "percent.rb", "percent.bcr", "percent.tcr", "percent.mhc")
 
+    split.by <- validate_split.by(split.by,obj)
     stopifnot(all(var %in% colnames(obj@meta.data)))
 
     if(!is.null(threshold)){
@@ -193,25 +194,35 @@ plot_feature_percentages <- function(obj, assay = "RNA", threshold = NULL, split
 
     plist <- list()
 
+
     for(i in seq_along(var)){
-        p <- obj@meta.data %>% 
+
+        p1 <- obj@meta.data %>% 
             ggplot(aes(x = !!sym(split.by), y = !!sym(var[i]))) +
             geom_violin(aes(fill = !!sym(split.by)), linewidth = 0.9) +
             ggprism::theme_prism(border = T) +
+            guides(fill = guide_none()) +
             labs(x = split.by, y = NULL, title = var[i]) +
             theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
         if(!is.null(threshold)){
-            p <- p +
+            p1 <- p1 +
                 geom_hline(yintercept = threshold[var[i]], color = "black", linetype = "dashed")}
 
-        plist[[i]] <- p
+
+        p2 <- obj@meta.data %>% 
+            ggplot(aes(x = !!sym(var[i]), y = !!sym(split.by))) +
+            ggridges::geom_density_ridges(aes(fill = !!sym(split.by))) +
+            geom_vline(xintercept = threshold[var[i]], color = "red", linetype = "dashed") +
+            ggprism::theme_prism(border = T) +
+            guides(fill = guide_none()) +
+            labs(title = var[i])
 
         dir.create(paste0(output_dir, "/plot_feature_percentages/"), showWarnings = F, recursive = T)
 
         if(!is.null(output_dir)){
             group.levels = unique(obj@meta.data[[split.by]])
-            w.base = 1000
+            w.base = 800
             h.base = 800
             w.increment = 150
             h.increment = 50
@@ -219,10 +230,23 @@ plot_feature_percentages <- function(obj, assay = "RNA", threshold = NULL, split
             h.scale <- ifelse(h.scale < 10, 10, h.scale)
             w = w.base + (w.increment * length(group.levels))
             h = h.base + (h.increment * h.scale)
-        
-            write_png(plist, output_dir = paste0(output_dir, "/plot_feature_percentages/"), filename = paste0(var[i], ".png"), width = w, height = h)}
+            write_png(p1, output_dir = paste0(output_dir, "/plot_feature_percentages/"), filename = paste0(var[i], ".png"), width = w, height = h)
+
+            group.levels = unique(obj@meta.data[[split.by]])
+            w.base = 1000
+            h.base = 800
+            h.increment = 150
+            w.increment = 50
+            w.scale <- max(nchar(as.character(group.levels)))
+            w.scale <- ifelse(w.scale < 10, 10, w.scale)
+            w = w.base + (w.increment * w.scale)
+            h = h.base + (h.increment * length(group.levels))
+            write_png(p2, output_dir = paste0(output_dir, "/plot_feature_percentages/"), filename = paste0(var[i], "_ridge_density.png"), width = w, height = h)
+            }
+
+        plist[[i]] <- list(p1, p2)
+        names(plist)[i] <- var[i]
     }
+
     return(plist)
 }
-
-

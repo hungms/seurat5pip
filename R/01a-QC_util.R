@@ -66,9 +66,6 @@ qc_by_standard <- function(obj, split.by = NULL, assay = "RNA", min.features = 2
 
     # get new dimensions
     new_dim <- dim(obj[[assay]]$counts)
-
-    # generate relevant plots
-    #plot_qc_by_standard(obj = obj, split.by = split.by, assay = assay, output_dir = output_dir)
     
     # print message
     m1 <- paste0(old_dim[1] - new_dim[1], " features removed from ",  assay, " assay")
@@ -214,9 +211,6 @@ qc_by_mad <- function(obj, assay = "RNA", split.by = NULL, var = c("percent.mt",
         write.csv(stats, file = paste0(output_dir, "/qc_by_mad_stats.csv"), row.names = FALSE)
         mad_cols <- colnames(obj@meta.data)[grepl("_by_mad", colnames(obj@meta.data))]
         write.csv(obj@meta.data %>% dplyr::select(all_of(mad_cols)), file = paste0(output_dir, "/qc_by_mad_metadata.csv"), row.names = T)}
-
-    # generate relevant plots
-    #plot_qc_by_mad(obj = obj, split.by = split.by, assay = assay, output_dir = output_dir)
 
     # log
     m1 <- paste("Total cells = ", ncol(obj))
