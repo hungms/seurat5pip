@@ -4,8 +4,20 @@
 \alias{cc_by_tricycle}
 \title{Calculate cell cycle phase with tricycle}
 \usage{
-cc_by_tricycle(obj, assay = "RNA", output_dir = NULL)
+cc_by_tricycle(obj, split.by = NULL, assay = "RNA", output_dir = NULL)
+}
+\arguments{
+\item{obj}{Seurat object}
+
+\item{assay}{assay name, defaults to "RNA"}
+
+\item{output_dir}{output directory}
+
+\item{org}{Organism, either "human" or "mouse"}
+}
+\value{
+Seurat object
 }
 \description{
-Calculate cell cycle phase with tricycle
+This function calculates the cell cycle phase with tricycle.
 }
