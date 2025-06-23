@@ -40,7 +40,7 @@ hvf_by_seurat_vst <- function(obj, normalization.method = "SCT", split.by = NULL
 
     dir.create(paste0(output_dir, "/seurat-vst/"))
     write.table(features, paste0(output_dir, "/seurat-vst/", normalization.method, "_", nfeatures, ".txt"), row.names = F)
-    write_png(p1, output_dir = paste0(output_dir, "/seurat-vst/"), filename = paste0(normalization.method, "_", nfeatures, ".png"), width = 4000, height = 3500)
+    write_png(p1, output_dir = paste0(output_dir, "/seurat-vst/"), filename = paste0(normalization.method, "_", nfeatures, ".png"), width = 2000, height = 1600)
 
     return(obj)
 }
@@ -73,13 +73,13 @@ run_pca <- function(obj, reduction = "pca", output_dir = NULL){
 
     # plot elbow, feature loadings, and PCA
     p1 <- ElbowPlot(obj, ndims = 50, reduction = reduction)
-    p2 <- plot_featureloadings(obj, reduction = reduction, output_dir = output_dir)
-    p3 <- plot_reduction(obj, reduction = reduction, reduction.type = "PCA", output_dir = output_dir)
+    p2 <- plot_featureloadings(obj, reduction = reduction)
+    p3 <- plot_reduction(obj, group.by = split.by, reduction = reduction, reduction.type = "PCA", label = F, mask = F, count.groups = F, shuffle = T)
 
     # save plots
-    write_png(p1, output_dir = output_dir, filename = "elbow.png", width = 1000, height = 800)
-    write_png(p2, output_dir = output_dir, filename = "feature_loadings.png", width = 1000, height = 800)
-    write_png(p3, output_dir = output_dir, filename = "pca.png", width = 1000, height = 800)
+    write_png(p1, output_dir = output_dir, filename = "plot_elbow.png", width = 1200, height = 1000)
+    write_png(p2, output_dir = output_dir, filename = "plot_feature_loadings.png", width = 2000, height = 1000)
+    write_png(p3, output_dir = output_dir, filename = "plot_pca.png", width = 2000, height = 1600)
 
     return(obj)
 }
