@@ -49,3 +49,27 @@ process_RNA_CELLCYCLE <- function(obj, assay = "RNA", split.by = NULL, output_di
 
     return(obj)
 }
+
+
+#' Process RNA dimensionality reduction
+#' 
+#' 
+process_RNA_DIMREDUC <- function(obj, assay = "RNA", split.by = NULL, output_dir = NULL){
+
+    # validate arguments
+    split.by <- validate_split.by(split.by, obj)
+
+    # dimensionality reduction
+    obj <- dimred_by_seurat(obj, assay = assay, split.by = split.by)
+
+    # identify highly variable features
+    obj <- hvf_by_seurat(obj, assay = assay, split.by = split.by)
+
+    # run pca
+    obj <- run_pca(obj, assay = assay, split.by = split.by)
+
+    # run umap
+    obj <- run_umap(obj, assay = assay, split.by = split.by)
+
+    return(obj)
+}
