@@ -11,7 +11,7 @@ gg_features(
   split.by = NULL,
   pal = NULL,
   pt.size = 0.5,
-  pt.alpha = 0.5,
+  pt.alpha = 1,
   legend.ncol = 1,
   label = T,
   count = T,

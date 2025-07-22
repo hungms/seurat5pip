@@ -40,10 +40,13 @@ gg_reduction <- function(df, reduction.type = NULL, group.by = NULL, split.by = 
     plot <- ggplot(df, aes_string(x = colnames(df)[1], y = colnames(df)[2])) +
         scale_x_continuous(expand = c(0.05, 0.05)) +
         scale_y_continuous(expand = c(0.05, 0.05)) +
-        theme_border() +
-        theme_text() +
-        umap_aes(type = reduction.type) +
-        theme(legend.key = element_blank())
+        theme_prism(border = T) + 
+        theme_gridlines() + 
+        theme(
+            aspect.ratio = 1, 
+            strip.text.x = element_text(size = 16),
+            legend.key = element_blank()) +
+        labs(x = paste0(toupper(reduction.type), " 1"), y = paste0(toupper(reduction.type), " 2"))
 
     # add split
     if(length(split.by) > 0){
@@ -176,7 +179,7 @@ gg_features <- function(
     split.by = NULL, 
     pal = NULL, 
     pt.size = 0.5, 
-    pt.alpha = 0.5, 
+    pt.alpha = 1, 
     legend.ncol = 1,
     label = T, 
     count = T, 
@@ -304,6 +307,7 @@ plot_reduction_mapquery <- function(obj, ref.obj, group.by = NULL, split.by = NU
     # main ggplot
     plot <- gg_reduction(ref.df, group.by = NULL, split.by = split.by, reduction.type = reduction.type, facet.ncol = facet.ncol)
     plot <- gg_point(plot, ref.df, group.by = NULL, pt.size = 0.3, pt.alpha = 0.3)
+    plot <- plot + theme_prism(border = T) + theme_gridlines() + theme(aspect.ratio = 1, strip.text.x = element_text(size = 16))
 
     # get obj embeddings
     obj.df <- get_embeddings(obj, reduction)
