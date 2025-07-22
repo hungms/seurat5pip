@@ -12,7 +12,8 @@ plot_dotplot(
   col.min = -2.5,
   col.max = 2.5,
   dot.min = 0,
-  dot.scale = 12,
+  base_size = 16,
+  dot.scale = 14,
   idents = NULL,
   group.by = NULL,
   split.by = NULL,
@@ -21,7 +22,8 @@ plot_dotplot(
   scale.by = "radius",
   scale.min = NA,
   scale.max = NA,
-  plot.title = " "
+  plot.title = " ",
+  diffexp = NULL
 )
 }
 \arguments{

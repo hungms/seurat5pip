@@ -30,7 +30,8 @@ plot_dotplot <- function(
   col.min = -2.5,
   col.max = 2.5,
   dot.min = 0,
-  dot.scale = 12,
+  base_size = 16,
+  dot.scale = 14,
   idents = NULL,
   group.by = NULL,
   split.by = NULL,
@@ -39,8 +40,10 @@ plot_dotplot <- function(
   scale.by = 'radius',
   scale.min = NA,
   scale.max = NA,
-  plot.title = " "
+  plot.title = " ",
+  diffexp = NULL
 ) {
+
   assay <- assay %||% DefaultAssay(object = object)
   DefaultAssay(object = object) <- assay
   
@@ -215,7 +218,8 @@ plot_dotplot <- function(
       levels = unique(x = feature.groups)
     )
   }
-  
+  data.plot$id <- factor(x = data.plot$id, levels = rev(id.levels))
+
   plot <- ggplot(data = data.plot, mapping = aes_string(x = 'features.plot', y = 'id')) +
     geom_point(mapping = aes_string(size = 'pct.exp', color = 'avg.exp.scaled')) +
     scale.func(range = c(0, dot.scale), limits = c(scale.min, scale.max)) +
@@ -232,8 +236,35 @@ plot_dotplot <- function(
       x = '',
       y = ifelse(test = is.null(x = split.by), yes = 'Identity', no = 'Split Identity')
     ) +
-    scale_color_gradient(low = cols[1], high = cols[2]) +
-    guides(color = guide_colorbar(title = 'Average\nExpression'))
+    scale_color_gradient(low = cols[1], high = cols[2], breaks = c(-1, 0, 1), labels = c("-1", "0", "1")) +
+    guides(color = guide_colorbar(
+        title = 'Average\nExpression', 
+        order = 1, 
+        title.position = "top",
+        direction = "horizontal",
+        frame.colour = "black",
+        ticks.colour = "black",
+        barwidth = 7,
+        barheight = 1.5))
+
+  ## add diffexp
+  if(!is.null(diffexp)){
+    columns_required <- c("features.plot", "id", "p_val_adj")
+    if(!is.null(split.by)){
+      columns_required <- c(columns_required, "split")}
+    stopifnot(all(columns_required %in% colnames(diffexp)))
+
+    diffexp$p_signif <- ifelse(diffexp$p_val_adj < 0.05, "padj < 0.05", "ns")
+    diffexp$p_signif <- factor(diffexp$p_signif, levels = c("ns", "padj < 0.05"))
+
+    diffexp <- diffexp %>%
+      filter(features.plot %in% features) %>%
+      merge(., data.plot, by = c("features.plot", "id"), all.x = T)
+    
+    plot <- plot + 
+      geom_point(data = diffexp, mapping = aes_string(size = 'pct.exp', color = 'avg.exp.scaled', stroke = 'p_signif'), shape = 21) #+
+      #scale_stroke(values = c("ns" = 0, "padj < 0.05" = 1))
+    }
   
   # Handle faceting
   if (!is.null(x = feature.groups) || !is.null(x = split.by)) {
@@ -256,9 +287,9 @@ plot_dotplot <- function(
       switch = NULL
     ) + theme(
       panel.spacing = unit(x = 1, units = "lines"),
-      strip.background = element_rect(fill = "grey90"),
-      strip.text.x = element_text(size = 18, margin = margin(0.3,0,0.3,0, "cm")),
-      strip.text.y = element_text(size = 18, margin = margin(0,0.3,0,0.3, "cm"))
+      strip.background = element_rect(fill = "#f7f7f7"),
+      strip.text.x = element_text(size = 16, margin = margin(0.3,0,0.3,0, "cm")),
+      strip.text.y = element_text(size = 16, margin = margin(0,0.3,0,0.3, "cm"))
     )
   }
   
